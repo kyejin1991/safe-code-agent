@@ -2,6 +2,26 @@
 
 A coding-agent skill for reducing over-editing, context loss, hallucinated certainty, and unverified code changes.
 
+## Demo
+
+![safe-code-agent demo](assets/demo/safe-code-agent-zoom-demo-base.png)
+
+Safe Code Agent is built around a simple idea:
+
+> do not let the agent patch from a guess.
+
+The demo shows a failing profile-save path where the agent should inspect nearby code before patching:
+
+- caller or callee
+- nearby schema and test
+- the actual failing path
+
+Then it should patch minimally and report verification honestly.
+
+[Watch the demo](assets/demo/safe-code-agent-zoom-demo.mp4)
+
+---
+
 Most AI coding-agent failures are not caused by a lack of code generation ability. 
 
 They usually come from the same pattern:

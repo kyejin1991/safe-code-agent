@@ -1,78 +1,44 @@
 # Safe Code Agent
 
-A coding-agent skill for reducing over-editing, context loss, hallucinated certainty, and unverified changes.
+> A surgical coding-agent skill for reducing over-editing, context loss, and hallucinated certainty.
 
 Most coding-agent failures come from the same pattern:
+- Editing before understanding the goal
+- Changing too much code unnecessarily
+- Assuming the root cause without evidence
+- Skipping code inspection
+- Hiding uncertainty or false positives in testing
 
-- editing before understanding the goal
-- changing too much
-- assuming the root cause
-- skipping code inspection
-- claiming tests passed when they did not run
-- hiding uncertainty
+**Safe Code Agent** enforces a simple, robust loop:
+`Goal` → `Inspect` → `Simulate` → `Patch Minimally` → `Verify` → `Report Uncertainty`
 
-Safe Code Agent adds a simple loop:
+---
 
-```text
-Goal -> Inspect -> Simulate -> Patch minimally -> Verify -> Report uncertainty
-```
+## 🚀 Key Features
 
-## Best for
+- **Deep Inspection**: Mandates reading relevant code before applying patches.
+- **Hypothesis-Driven**: Treats bug causes as hypotheses until proven by evidence.
+- **Minimal Patches**: Prefers small, targeted changes over large refactors.
+- **Verification First**: Distinguishes between verified runtime behavior and inferred execution.
+- **Honest Reporting**: Explicitly states remaining uncertainty after work is done.
 
-- debugging
-- multi-file changes
-- refactors
-- architecture-sensitive work
-- unclear root causes
-- performance/security-sensitive changes
-- high-risk changes
-
-## What it does
-
-Safe Code Agent makes a coding agent:
-
-- inspect relevant code before patching
-- classify small vs full-process work using file and line-count thresholds
-- preserve existing conventions and architecture
-- avoid unrelated features, abstractions, rewrites, and refactors
-- treat bug causes as hypotheses until supported by evidence
-- distinguish inferred execution paths from verified runtime behavior
-- report verification as `Run`, `Manual`, `Not run`, or `Inferred`
-- state remaining uncertainty honestly
-
-## Repository structure
+## 📂 Repository Structure
 
 ```text
 safe-code-agent/
 ├─ README.md
 ├─ AGENTS.md
+├─ LICENSE
 └─ skills/
    └─ safe-code-agent/
       └─ SKILL.md
 ```
 
-## Install
+## 🛠️ Quick Start
 
-Copy this file into your agent skills directory:
+1. **Install Skill**: Copy `skills/safe-code-agent/SKILL.md` into your agent's skills directory.
+2. **Global Rules (Optional)**: Copy `AGENTS.md` into your project root for lightweight global defaults.
 
-```text
-skills/safe-code-agent/SKILL.md
-```
+## ⚖️ License
 
-Optionally copy `AGENTS.md` into your project root for lightweight global defaults.
-
-## When to use full mode
-
-Use the full process when any of these are true:
-
-- 2 or more files may change
-- expected patch is 30+ changed lines
-- root cause is unclear
-- behavior crosses module boundaries
-- tests need to be added or updated
-- public API, schema, auth, payment, security, async, concurrency, migration, or cross-module behavior is touched
-- rollback or data-loss risk exists
-
-## License
-
-MIT
+MIT License - Copyright (c) 2026 kyejin1991

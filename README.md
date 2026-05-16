@@ -49,7 +49,7 @@ Goal -> Inspect -> Simulate -> Patch minimally -> Verify -> Report uncertainty
 - **Prototype Mode**: allows exploratory UI, throwaway prototypes, and early idea tests without claiming production readiness.
 - **Gate Router Report**: makes the selected mode, activated gates, skipped gates, and reason visible for non-trivial tasks.
 - **Required Minimums Report**: reports inspected files, failure modes checked, verification commands, and completion status for Full/Critical tasks.
-- **Evidence Source Labels**: every evidence claim must identify their source: opened file, search result, command output, manual check, user input, or inference.
+- **Evidence Source Labels**: every evidence claim must say whether it came from an opened file, search result, command output, manual check, user input, or inference.
 - **Stricter Completion Rules**: prevents partial verification from being reported as complete.
 
 ## Mode Summary
@@ -96,6 +96,27 @@ Do not use "verified" unless evidence comes from **Command output** or **Manual 
 - **Implemented, verification pending**: code changed but verification was not run or was interrupted.
 - **Not complete**: core verification failed or the cause remains unresolved.
 
+## Best for
+
+- unclear root-cause debugging
+- multi-file changes
+- risky edits
+- verification-sensitive work
+- contract/fallback/precedence logic
+- negative tests or failure-path checks
+- AI coding workflows where false confidence is costly
+
+## Not for
+
+This skill is intentionally not optimized for:
+
+- trivial syntax questions
+- formatting-only edits
+- obvious one-line fixes
+- tasks where a direct answer is enough
+
+Use Micro Mode or the lightweight `AGENTS.md` defaults for small tasks.
+
 ## Install
 
 Copy the skill file into your agent skills directory:
@@ -141,27 +162,6 @@ safe-code-agent/
       └─ SKILL.md
 ```
 
-## Best for
-
-- unclear root-cause debugging
-- multi-file changes
-- risky edits
-- verification-sensitive work
-- contract/fallback/precedence logic
-- negative tests or failure-path checks
-- AI coding workflows where false confidence is costly
-
-## Not for
-
-This skill is intentionally not optimized for:
-
-- trivial syntax questions
-- formatting-only edits
-- obvious one-line fixes
-- tasks where a direct answer is enough
-
-Use Micro Mode or the lightweight `AGENTS.md` defaults for small tasks.
-
 ## Optional advanced notes
 
 The advanced notes are not part of the default workflow.
@@ -194,7 +194,7 @@ Do not load all advanced docs for every task. They are optional guardrails for h
 
 The user should not need to manually decide which advanced doc to use.
 
-During the task, the agent watches for risk signals and recommend the relevant advanced doc only when needed.
+During the task, watch for risk signals and recommend the relevant advanced doc only when needed.
 
 | Risk signal | Recommend |
 |---|---|
@@ -207,9 +207,19 @@ During the task, the agent watches for risk signals and recommend the relevant a
 
 Recommended message format:
 
+```text
 Risk signal detected: [reason]
 Recommended advanced doc: [doc]
 Apply it now?
+```
+
+Router rules:
+
+- Do not load all advanced docs by default.
+- Recommend at most 1 advanced doc at a time.
+- For Critical tasks, recommend up to 2 advanced docs.
+- If the answer can be resolved with the core skill, do not escalate.
+- If applying the advanced doc will noticeably slow the task, ask before applying it.
 
 ## Notes
 

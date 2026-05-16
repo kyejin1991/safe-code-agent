@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.2.1-balanced-router
+
+### Added
+
+- Risk Signal Router in `README.md`, `AGENTS.md`, and `SKILL.md`.
+- `docs/advanced/risk-signal-router.md`.
+- Clear trigger rules for recommending runtime enforcement, prototype-to-production, and structured hallucination docs.
+
+### Rationale
+
+Balanced-plus made advanced docs optional, but users still had to know when to apply them.
+The Risk Signal Router lets the agent detect risk signals and recommend the relevant advanced doc instead of expecting the user to choose manually.
+
 ## v0.2.1-balanced
 
 ### Changed
@@ -20,7 +33,6 @@
 v0.2.2-style additions were useful as analysis, but too heavy for the default skill.
 This balanced package keeps the core workflow practical while retaining advanced guidance as optional documentation.
 
-
 ## v0.2.1
 
 ### Added
@@ -37,7 +49,6 @@ This balanced package keeps the core workflow practical while retaining advanced
 - Clarified that v0.2.1 is a stability release, not a heavier workflow.
 - Improved guardrails against structured hallucination.
 - Made fast prototyping possible without claiming production readiness.
-
 
 ## v0.2.0 - Gate Router and quantified safety rules
 
@@ -56,7 +67,6 @@ Added:
 - Partial verification label
 - Completion Status
 - Evidence Report format
-- Real-world proof example
 
 Changed:
 
@@ -78,24 +88,3 @@ Included:
 - verification labels
 - large task memory rules
 - lightweight AGENTS.md defaults
-
-## v0.2.1-balanced-plus
-
-### Added
-
-- Advanced docs trigger table in `README.md`.
-- Advanced docs trigger table in `AGENTS.md`.
-
-## v0.2.1-balanced-router
-
-### Added
-
-- Risk Signal Router in `README.md`, `AGENTS.md`, and `SKILL.md`.
-- `docs/advanced/risk-signal-router.md`.
-- Clear trigger rules for recommending runtime enforcement, prototype-to-production, and structured hallucination docs.
-
-### Rationale
-
-Balanced-plus made advanced docs optional, but users still had to know when to apply them.
-
-The Risk Signal Router lets the agent detect risk signals and recommend the relevant advanced doc instead of expecting the user to choose manually.

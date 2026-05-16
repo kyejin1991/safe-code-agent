@@ -15,14 +15,6 @@ Balanced-plus made advanced docs optional, but users still had to know when to a
 The Risk Signal Router lets the agent detect risk signals and recommend the relevant advanced doc instead of expecting the user to choose manually.
 
 
-## v0.2.1-balanced-plus
-
-### Added
-
-- Advanced docs trigger table in `README.md`.
-- Advanced docs trigger table in `AGENTS.md`.
-
-
 ## v0.2.1-balanced
 
 ### Changed
@@ -101,4 +93,11 @@ Included:
 - verification labels
 - large task memory rules
 - lightweight AGENTS.md defaults
+
+## v0.2.1-balanced-plus
+
+### Added
+
+- Advanced docs trigger table in `README.md`.
+- Advanced docs trigger table in `AGENTS.md`.
  

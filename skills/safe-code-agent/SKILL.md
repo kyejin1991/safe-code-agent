@@ -1,60 +1,169 @@
 ---
 name: safe-code-agent
-description: A coding skill for complex coding tasks such as debugging, multi-file changes, refactors, architecture-sensitive work, unclear root causes, and high-risk changes. Use it to reduce over-editing, context loss, hallucinated certainty, and unverified changes.
+description: A coding skill for complex or risky coding tasks such as debugging, multi-file changes, refactors, architecture-sensitive work, unclear root causes, contract/fallback logic, negative tests, and high-risk changes. Use it to reduce over-editing, context loss, hallucinated certainty, and unverified changes.
 ---
 
-# safe-code-agent
+# safe-code-agent v0.2
 
 ## Core Loop
 
 Goal -> Inspect -> Simulate -> Patch minimally -> Verify -> Report uncertainty
 
+## Instruction Precedence
+
+When global instructions and this skill conflict:
+
+1. Safety and correctness override speed.
+2. Explicit user instructions override default workflow preferences.
+3. This skill overrides global defaults only when it is triggered.
+4. Global instructions remain active unless this skill explicitly narrows or escalates them.
+5. Risk overrides size: small changes can require deeper checks when risk is high.
+6. Verification status must never be weakened by mode selection or time budget.
+7. Do not claim broad certainty from partial inspection or partial verification.
+
+## Gate Router
+
+Do not run every gate for every task.
+
+First choose the mode:
+
+- Micro
+- Light
+- Full
+- Critical
+
+Then activate only the gates triggered by the task:
+
+- Assumption Gate: unclear assumptions or ambiguous requirements
+- Simplicity Check: non-trivial implementation, abstraction, or refactor risk
+- Design Interrogation Gate: costly or ambiguous design decision
+- Contract & Precedence Check: config/input/fallback/permission/schema/API behavior
+- Negative Case Hygiene: negative tests or failure-path verification
+- Verification Budget: verification expected over 5 minutes
+- Evidence Report: non-trivial or verification-sensitive task
+
+Recommended number of active gates:
+
+| Mode | Minimum | Recommended | Maximum |
+|---|---:|---:|---:|
+| Micro | 0 | 0-1 | 1 |
+| Light | 1 | 1-2 | 3 |
+| Full | 2 | 2-4 | 5 |
+| Critical | 3 | 4-6 | 7 |
+
+If you mention activated gates, keep it brief:
+
+```text
+Mode: Full
+Activated gates: Contract & Precedence Check, Negative Case Hygiene
+Skipped: Design Interrogation Gate — no architecture decision
+```
+
 ## Mode Selection
 
-Use these thresholds as defaults, not hard limits.
+Use these thresholds as defaults, not hard limits. Risk overrides size.
 
-Escalate to Full Mode when risk is high even if the patch is small.
+### Micro Mode
 
-De-escalate to Light Mode when the change is mechanical, local, and low-risk.
+Use Micro Mode only when all are true:
+
+- 1 file
+- under 10 changed lines, maximum 15
+- obvious cause
+- no public API, schema, config, env, auth, payment, security, migration, persistence, async, concurrency, data-loss, or cross-module behavior touched
+- no new test required
+
+Micro Mode limits:
+
+| Item | Minimum | Recommended | Maximum |
+|---|---:|---:|---:|
+| files changed | 1 | 1 | 1 |
+| changed lines | 1 | 5-10 | 15 |
+| code inspection | nearby 20 lines | nearby 30 lines | nearby 50 lines |
+| related files inspected | 0 | 0 | 1 |
+| failure modes | 0 | 1 | 1 |
+| verification paths | 0 | 0-1 | 1 |
+| final report | 2 lines | 3 lines | 5 lines |
+
+Micro final report must include:
+
+```text
+Changed: <file>
+Why: <one-line reason>
+Verification: <Run / Manual / Not run / Inferred / Partial>
+```
+
+Never omit the verification label, even in Micro Mode.
 
 ### Light Mode
 
-Use Light Mode when all are true:
+Use Light Mode for simple, local, low-risk changes.
 
-- expected change is 1 file
-- expected patch is under 30 changed lines
-- root cause or requested change is obvious
-- no public API, schema, auth, payment, security, async, concurrency, migration, or cross-module behavior is touched
-- verification can be handled with 1 focused test, typecheck, lint, or manual scenario
+Default limits:
+
+| Item | Minimum | Recommended | Maximum |
+|---|---:|---:|---:|
+| files changed | 1 | 1 | 2 |
+| changed lines | 10 | 10-30 | 50 |
+| files inspected | 1 | 1-2 | 3 |
+| caller/callee checks | 0 | 1 | 2 |
+| test files checked | 0 | 1 if nearby | 1 |
+| failure modes | 1 | 1-2 | 3 |
+| verification paths | 1 | 1 | 2 |
+| final report | 3 lines | 4-6 lines | 8 lines |
 
 ### Full Mode
 
 Use Full Mode when any are true:
 
-- 2 or more files may change
+- 2+ files may change
 - expected patch is 30+ changed lines
 - root cause is unclear
 - behavior crosses module boundaries
 - tests need to be added or updated
-- public API, schema, auth, payment, security, async, concurrency, migration, or cross-module behavior is touched
+- public API, schema, config, env, auth, permission, payment, security, async, concurrency, migration, persistence, data-loss, or cross-module behavior is touched
 - rollback or data-loss risk exists
 
-## Patch Size Guidance
+Default limits:
 
-Use these size labels as default estimates:
+| Item | Minimum | Recommended | Maximum |
+|---|---:|---:|---:|
+| files changed | 2 | 2-4 | 6 |
+| changed lines | 30 | 30-120 | 200 |
+| files inspected | 2 | 3-5 | 8 |
+| relationship points | 2 | 2-4 | 5 |
+| failure modes | 3 | 3-5 | 7 |
+| verification commands | 1 | 2-4 | 5 |
+| tests added/updated | 1 if needed | 1-2 | 3 |
+| final report | 6 lines | 8-12 lines | 15 lines |
 
-- Tiny: 1 file and under 10 changed lines
-- Small: 1 file and 10-30 changed lines
-- Medium: 2-4 files or 30-120 changed lines
-- Large: 5+ files or 120+ changed lines
+### Critical Mode
 
-Risk overrides size.
+Use Critical Mode for high-risk behavior, regardless of patch size:
 
-Small changes can require Full Mode when they touch high-risk behavior.
+- auth or permission
+- payment or billing
+- security-sensitive validation
+- schema or migrations
+- persistence or data deletion
+- public API contracts
+- async/concurrency/race conditions
+- irreversible behavior
+- external tool execution or filesystem paths
 
-Large mechanical changes can use Light Mode only when they are local, repetitive, and low-risk.
+Default limits:
 
-## Rules
+| Item | Minimum | Recommended | Maximum |
+|---|---:|---:|---:|
+| files inspected | 3 | 4-8 | 12 |
+| relationship points | 3 | 4-6 | 8 |
+| failure modes | 5 | 5-8 | 10 |
+| negative cases | 1 | 2-4 | 5 |
+| verification commands | 2 | 3-5 | 7 |
+| evidence signals | 3 | 3-4 | 4 |
+| final report | 10 lines | 12-18 lines | 25 lines |
+
+## Core Rules
 
 - Understand the requested behavior before editing.
 - Inspect relevant code before asking when the answer is in the codebase.
@@ -89,33 +198,212 @@ For Full Mode, inspect at least 2 relationship points when available:
 
 If inspection is partial, state the inspected scope.
 
-## Evidence Discipline
+## Assumption Gate
 
-- Do not claim to have inspected code unless relevant files were actually opened or searched.
-- Treat bug causes as hypotheses until supported by code, tests, logs, or reproduction.
-- Distinguish inferred execution paths from verified runtime behavior.
-- Treat relevant files as known relevant files unless the search scope was comprehensive.
-- Do not claim there are no failure modes or counterexamples; state only what was checked.
-- Report verification as one of: Run, Manual, Not run, or Inferred.
+Use this when a task depends on an assumption that may affect implementation.
 
-## Process
+Classify assumptions before acting:
 
-1. Confirm requested behavior vs current behavior.
-2. Find known relevant files, dependencies, and data flow.
-3. Identify the core issue or implementation goal.
-4. Simulate the execution path.
-5. Check failure modes and counterexamples.
-6. Choose the smallest safe change.
-7. Add or update tests when appropriate.
-8. Patch.
-9. Verify.
-10. Report the result and remaining uncertainty.
+1. Code-checkable
+   - inspect code first
+2. Requirement-dependent
+   - ask the user if blocking
+3. Safety default
+   - choose conservative behavior and state uncertainty
+
+Limits:
+
+| Item | Minimum | Recommended | Maximum |
+|---|---:|---:|---:|
+| assumptions listed | 1 | 1-3 | 5 |
+| user questions | 0 | 0-1 | 1 |
+| interpretations | 1 | 2 | 3 |
+| blocking assumptions | 0 | 0-1 | 2 |
+
+Rules:
+
+- Do not ask if the answer can be found in the codebase.
+- Do not treat assumptions as facts.
+- If multiple interpretations exist, choose the smallest reversible change.
+- Do not implement multiple interpretations unless explicitly requested.
+
+For each critical assumption, report one status:
+
+- Confirmed by code
+- Confirmed by test/log
+- User-confirmed
+- Unconfirmed
+
+## Simplicity Check
+
+Use this for non-trivial implementation or refactor risk.
+
+Ask at most 4 questions:
+
+- Is there a smaller change that solves the same problem?
+- Am I adding flexibility that was not requested?
+- Am I creating an abstraction for single-use code?
+- Does this preserve the behavior contract?
+
+Limits:
+
+| Item | Minimum | Recommended | Maximum |
+|---|---:|---:|---:|
+| simplicity questions | 1 | 2-3 | 4 |
+| alternatives compared | 0 | 1 | 2 |
+| refactor checks | 0 | 1 if needed | 1 |
+| smaller-change review | 1 | 1 | 2 |
+
+Simplicity means the smallest code that preserves the behavior contract.
+
+Do not simplify by removing validation, error behavior, or precedence rules.
+
+Contract correctness overrides line-count simplicity.
+
+## Design Interrogation Gate
+
+Use this only when at least one is true:
+
+- requirement has 2+ valid interpretations
+- architecture boundary may change
+- data model or API contract may change
+- user-facing behavior is ambiguous
+- implementation choice affects future work
+- the wrong choice is costly to reverse
+
+Limits:
+
+| Item | Minimum | Recommended | Maximum |
+|---|---:|---:|---:|
+| questions | 1 | 1 | 2 |
+| recommended answers | 1 per question | 1 per question | 2 per question |
+| interpretations | 2 | 2 | 3 |
+| files inspected before asking | 0 | 1-2 if code-checkable | 3 |
+| design options compared | 1 | 2 | 3 |
+
+Rules:
+
+- Ask at most 1 blocking question before patching unless the user explicitly wants deeper interrogation.
+- Do not ask the user if the answer can be found by inspecting the codebase.
+- Recommended answers are proposals, not facts.
+
+For each recommended default, label the basis:
+
+- Code-backed
+- Safety default
+- Product assumption
+- Unknown
+
+If the decision is easy to reverse, prefer simplicity. If the decision is costly to reverse, use this gate.
+
+## Contract & Precedence Check
+
+Run this before patching behavior-sensitive code.
+
+Trigger this check when the code includes:
+
+- configuration
+- environment variables
+- defaults
+- fallbacks
+- user-provided inputs
+- permissions
+- schemas
+- migrations
+- persistence
+- external paths or tools
+- API boundaries
+- functions named like resolve, merge, normalize, default, fallback, or override
+
+Before patching, write down:
+
+1. Input sources
+   - explicit input
+   - config
+   - environment
+   - persisted state
+   - default value
+2. Expected precedence
+   - which source should win?
+3. Missing vs invalid behavior
+   - missing value may fallback
+   - invalid explicit value must not silently fallback unless the contract clearly says so
+4. Expected failure behavior
+   - what should fail?
+   - what error/status/message should appear?
+5. Silent success risk
+   - could the patch make an invalid case succeed?
+
+Limits:
+
+| Item | Minimum | Recommended | Maximum |
+|---|---:|---:|---:|
+| input sources checked | 2 | 3-4 | 5 |
+| precedence levels | 2 | 3-4 | 5 |
+| invalid/missing distinction | 1 | required | required |
+| failure conditions | 1 | 1-3 | 5 |
+| silent success checks | 1 | 1-2 | 3 |
+| verification cases | 1 | 2-3 | 4 |
+
+For precedence-sensitive changes, verify at least:
+
+- explicit valid input
+- invalid explicit input
+- missing input fallback
+
+If not all are run, label verification as Partial or Inferred.
+
+Contract Check identifies risk. It does not authorize broad refactors.
+
+Patch only the contract violation needed for the requested behavior. Mention unrelated contract issues separately.
+
+## Negative Case Hygiene
+
+A negative test is valid only when it fails for the intended reason.
+
+For each negative case, define the expected failure before running it:
+
+- expected status or error code
+- expected message pattern
+- expected exit code, if relevant
+- expected absence of side effects
+
+Minimum evidence:
+
+- Low-risk negative case: confirm at least 2 evidence signals.
+- High-risk negative case: confirm at least 3 evidence signals.
+- If only 1 signal is checked, label the result as Inferred, not Verified.
+
+Limits:
+
+| Item | Minimum | Recommended | Maximum |
+|---|---:|---:|---:|
+| evidence signals | 2 | 2-3 | 4 |
+| high-risk signals | 3 | 3-4 | 4 |
+| negative cases | 1 | 1-3 | 5 |
+| cleanup/reset checks | 1 | 1-2 | 3 |
+| side-effect checks | 0 | 1 if relevant | 2 |
+
+If the test fails for a different reason, fix the test setup before trusting the result.
+
+If the failure reason cannot be proven, report:
+
+```text
+Verification: Inferred
+Reason: failure occurred, but intended failure cause was not proven.
+```
+
+A negative test is only useful if it proves the intended failure path.
+
+Do not simplify a negative test below the required evidence minimum.
 
 ## Failure Mode Minimums
 
 For Light Mode, check at least 1 relevant failure mode if the change affects behavior.
 
 For Full Mode, check at least 3 relevant failure modes.
+
+For Critical Mode, check at least 5 relevant failure modes.
 
 Prefer failure modes from this list:
 
@@ -129,37 +417,105 @@ Prefer failure modes from this list:
 - data loss or rollback risk
 - public API compatibility
 - configuration or environment mismatch
+- silent fallback or silent success
+- missing vs invalid input confusion
 
-## Verification Minimums
+## Verification Budget
 
-For Tiny changes:
+Classify verification cost before running long checks:
 
-- 1 focused manual check or Inferred verification is acceptable
-- label verification as Manual or Inferred
+| Cost | Time | Rule |
+|---|---:|---|
+| Quick | under 1 minute | run directly |
+| Standard | 1-5 minutes | usually run |
+| Long | 5-20 minutes | run targeted checks first and state why long check is needed |
+| Expensive | over 20 minutes | ask before running unless user requested full verification |
 
-For Small changes:
+Verification command count limits:
 
-- run 1 nearby test, typecheck, lint, or manual scenario when available
-- if not run, label as Not run or Inferred
+| Mode | Minimum | Recommended | Maximum |
+|---|---:|---:|---:|
+| Micro | 0 | 0-1 | 1 |
+| Light | 1 | 1 | 2 |
+| Full | 1 | 2-4 | 5 |
+| Critical | 2 | 3-5 | 7 |
 
-For Medium changes:
+Verification order:
 
-- run at least 1 targeted test or typecheck/build when available
-- if not run, state the exact command that should be run next
+1. syntax or type check
+2. targeted unit test
+3. targeted smoke or reproduction
+4. related integration test
+5. full suite or aggregate
 
-For Large or high-risk changes:
+Do not skip targeted verification and jump directly to expensive full-suite checks unless required.
 
-- run targeted tests plus typecheck/build when available
-- if not run, label as Not run and state exact commands to run next
+Do not invent verification commands.
 
-Verification labels:
+Before suggesting a command, inspect available project files such as package.json, Makefile, pyproject.toml, tox.ini, CI config, or project docs when available.
 
-- Run: command or automated check was executed
-- Manual: manual scenario or reproduction step was checked
-- Not run: verification could not be executed; explain why and what should run next
-- Inferred: reasoned from code or context only; not runtime-verified
+If no command is found, say:
 
-Do not claim the task is complete unless verification was performed or remaining uncertainty is explicitly stated.
+```text
+Next command: unknown — no test script found in inspected files.
+```
+
+If verification is interrupted, report partial results and the exact next command.
+
+## Verification Labels
+
+Report verification as one of:
+
+- Run: command or automated check was executed.
+- Manual: manual scenario or reproduction step was checked.
+- Not run: verification could not be executed; explain why and what should run next.
+- Inferred: reasoned from code or context only; not runtime-verified.
+- Partial: some checks passed, but required full/negative/contract checks remain.
+
+## Completion Status
+
+Completion status must be one of:
+
+- Complete: required verification passed.
+- Implemented, partially verified: targeted checks passed but required full/negative/contract checks remain.
+- Implemented, verification pending: code changed but verification was not run or was interrupted.
+- Not complete: core verification failed or the cause remains unresolved.
+
+Rules:
+
+- Do not claim Complete unless required verification passed.
+- Targeted success does not imply full correctness.
+- Tests passing does not prove every assumption.
+- Verification Budget may limit what runs, but it must not weaken the status label.
+
+## Evidence Report
+
+For non-trivial tasks, report:
+
+- Changed: files or areas changed
+- Why: reason for the change
+- Evidence: code/log/test that supports the change
+- Verification: Run / Manual / Not run / Inferred / Partial
+- Completion status: Complete / Implemented, partially verified / Implemented, verification pending / Not complete
+- Remaining risk: what was not checked
+- Next command: exact command if more verification is needed
+
+Report length limits:
+
+| Mode | Minimum | Recommended | Maximum |
+|---|---:|---:|---:|
+| Micro | 2 lines | 3 lines | 5 lines |
+| Light | 3 lines | 4-6 lines | 8 lines |
+| Full | 6 lines | 8-12 lines | 15 lines |
+| Critical | 10 lines | 12-18 lines | 25 lines |
+
+Micro report may include only:
+
+- Changed
+- Why
+- Verification
+
+Full and Critical reports should include all fields.
 
 ## Large Task Memory
 
@@ -172,6 +528,7 @@ For large tasks, preserve:
 - decisions made and why
 - changed files
 - verification results
+- completion status
 - remaining risks
 - next action
 
@@ -179,37 +536,16 @@ When context grows:
 
 1. Drop discarded hypotheses first.
 2. Summarize files by responsibility.
-3. Preserve decisions, changed files, tests, risks, and next action.
+3. Preserve decisions, changed files, tests, risks, completion status, and next action.
 
-## Output
+## Final Principle
 
-Small tasks:
+Minimum values protect quality.
 
-- direct answer
-- minimal explanation
-- essential verification only
+Maximum values prevent over-process.
 
-Medium tasks:
+Small tasks should stay light.
 
-- brief plan
-- change summary
-- verification
+Risky tasks should become precise.
 
-Large tasks:
-
-- goal
-- findings
-- plan
-- risks
-- verification
-
-Debugging:
-
-- likely cause
-- evidence
-- fix
-- verification
-
-## Optional
-
-Use subagents only when explicitly requested and clearly beneficial.
+Verification should always be honest.

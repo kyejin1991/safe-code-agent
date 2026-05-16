@@ -1,38 +1,49 @@
 # Safe Code Agent Defaults
 
-Use these defaults for coding work.
+Project-level global defaults. Always-on lightweight rules.
 
-## Core Rules
+## Instruction Precedence
+
+When global instructions and a task-specific skill conflict:
+
+1. Safety and correctness override speed.
+2. Explicit user instructions override default workflow preferences.
+3. Task-specific skill rules override global defaults only when the skill is triggered.
+4. Global instructions remain active unless the skill explicitly narrows or escalates them.
+5. Risk overrides size.
+6. Verification status must never be weakened by mode selection or time budget.
+7. Do not claim broad certainty from partial inspection or partial verification.
+
+## Global Coding Defaults
 
 - Understand the requested behavior before editing.
 - Inspect relevant code before asking when the answer is in the codebase.
 - Prefer the smallest safe change.
 - Every changed line should directly support the requested behavior or verification.
-- Preserve local conventions, naming, structure, and architecture.
+- Preserve local style, naming, structure, and conventions.
 - Avoid unrelated features, abstractions, rewrites, and refactors.
-- Verify before claiming the task is complete.
+- Do not claim verification unless it was actually run or clearly labeled.
 - State remaining uncertainty instead of pretending everything is proven.
 
-## Mode Defaults
+## When to use the full safe-code-agent skill
 
-Use a light process for simple, local, low-risk changes.
+Use `skills/safe-code-agent/SKILL.md` for:
+- complex, risky, or unclear tasks
+- multi-file changes or architecture-sensitive work
+- when root causes are not obvious
+- security, auth, schema, or payment related changes
 
-Use the full `safe-code-agent` skill for:
+## Verification labels
 
-- debugging
-- 2+ file changes
-- 30+ changed lines
-- unclear root causes
-- architecture-sensitive work
-- performance/security-sensitive changes
-- public API, schema, auth, payment, async, concurrency, migration, or cross-module behavior
-- rollback or data-loss risk
+- Run: command or automated check was executed.
+- Manual: manual scenario or reproduction step was checked.
+- Not run: verification could not be executed.
+- Inferred: reasoned from code or context only.
+- Partial: some checks passed, but more are required.
 
-## Verification Labels
+## Completion status
 
-Report verification as one of:
-
-- Run: command or automated check was executed
-- Manual: manual scenario or reproduction step was checked
-- Not run: verification could not be executed; explain why and what should run next
-- Inferred: reasoned from code or context only; not runtime-verified
+- Complete
+- Implemented, partially verified
+- Implemented, verification pending
+- Not complete

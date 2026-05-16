@@ -1,107 +1,84 @@
-# Safe Code Agent
+# Safe Code Agent v0.2
 
 A coding-agent skill for reducing over-editing, context loss, hallucinated certainty, and unverified code changes.
 
-## Demo
+Safe Code Agent is not a magic safety system. It is a practical workflow that makes AI coding agents inspect first, patch less, verify honestly, and report uncertainty.
 
-![safe-code-agent demo](assets/demo/safe-code-agent-zoom-demo-base.png)
+## What changed in v0.2
 
-Safe Code Agent is built around a simple idea:
+v0.2 keeps the original safety loop, but adds mode selection, gate routing, quantified limits, and completion states.
 
-> do not let the agent patch from a guess.
+The goal is not to make every task heavier.
 
-The demo shows a failing profile-save path where the agent should inspect nearby code before patching:
+The goal is:
+- small tasks stay light
+- risky tasks become precise
+- verification stays honest
+- assumptions do not become facts
+- partial verification is not reported as complete
 
-- caller or callee
-- nearby schema and test
-- the actual failing path
+## Core Loop
 
-Then it should patch minimally and report verification honestly.
+Goal -> Inspect -> Simulate -> Patch minimally -> Verify -> Report uncertainty
 
-[Watch the demo](assets/demo/safe-code-agent-zoom-demo.mp4)
+## v0.2 Additions
 
----
+- **Instruction Precedence**: Resolves conflicts between global instructions and task-specific skill rules.
+- **Gate Router**: Activates only the gates required by the task.
+- **Micro Mode**: Keeps tiny, low-risk edits lightweight.
+- **Assumption Gate**: Separates code-checkable assumptions, requirement-dependent assumptions, and safety defaults.
+- **Simplicity Check**: Prevents overengineering without breaking behavior contracts.
+- **Design Interrogation Gate**: Asks at most one blocking question for costly or ambiguous design decisions.
+- **Contract & Precedence Check**: Checks explicit input, config, env, persisted state, defaults, invalid vs missing behavior, and fallback risk.
+- **Negative Case Hygiene**: Makes negative tests prove the intended failure path.
+- **Verification Budget**: Avoids jumping straight to expensive full-suite checks while still reporting partial verification honestly.
+- **Completion Status**: Distinguishes Complete, partially verified, verification pending, and not complete.
+- **Evidence Report**: Provides a structured summary of what was actually checked.
 
-Most AI coding-agent failures are not caused by a lack of code generation ability. 
+## Mode Summary
 
-They usually come from the same pattern:
-- Editing before understanding the goal
-- Changing too much
-- Assuming the root cause
-- Skipping code inspection
-- Claiming verification without running it
-- Hiding uncertainty
+| Mode | Use for | Default limits |
+|---|---|---|
+| Micro | tiny, obvious, low-risk edits | 1 file, under 10 changed lines |
+| Light | small local changes | 1 file, under 30 changed lines |
+| Full | unclear, multi-file, or verification-sensitive work | 2-4 files or 30-120 changed lines |
+| Critical | auth, schema, payment, data loss, security, migration, public API, concurrency | risk-based, regardless of size |
 
-Safe Code Agent adds a simple safety loop:
-`Goal` → `Inspect` → `Simulate` → `Patch minimally` → `Verify` → `Report uncertainty`
+## Verification Labels
 
----
+- **Run**: command or automated check was executed.
+- **Manual**: manual scenario or reproduction step was checked.
+- **Not run**: verification could not be executed; explain why and what should run next.
+- **Inferred**: reasoned from code or context only; not runtime-verified.
+- **Partial**: some checks passed, but required full/negative/contract checks remain.
 
-## 🚀 Example Behavior
+## Completion Status
 
-Instead of a generic:
-> Fixed the bug. Tests should pass.
+- **Complete**: required verification passed.
+- **Implemented, partially verified**: targeted checks passed but required full/negative/contract checks remain.
+- **Implemented, verification pending**: code changed but verification was not run or was interrupted.
+- **Not complete**: core verification failed or the cause remains unresolved.
 
-**Safe Code Agent** pushes the agent to report:
-
-```text
-Likely cause: The input branch was treating an empty value as valid.
-Evidence: Checked the validation path in `src/validate.ts` and the related test in `validate.test.ts`.
-Fix: Added a minimal guard for empty input.
-Verification: Run — `npm test -- validate.test.ts`
-Remaining uncertainty: Broader form flows were not tested.
-```
-
----
-
-## 🛠️ Install
+## Install
 
 Copy the skill file into your agent skills directory:
 
-```text
-skills/safe-code-agent/SKILL.md
-```
+`skills/safe-code-agent/SKILL.md`
 
-For project-wide defaults, copy `AGENTS.md` into your project root.
+For lightweight project-wide defaults, copy:
 
-**Recommended structure:**
-```text
-your-project/
-├─ AGENTS.md
-└─ skills/
-   └─ safe-code-agent/
-      └─ SKILL.md
-```
+`AGENTS.md`
 
----
-
-## Why?
-
-AI coding agents are fast, but they often fail in predictable ways:
-- They over-edit.
-- They lose context.
-- They infer runtime behavior without evidence.
-- They call a guess a root cause.
-- They skip verification.
-- They say "done" when tests were not run.
-
-This skill gives the agent concrete operating rules for safer code changes.
-
-## 🚀 Key Features
-
-- **Deep Inspection**: Mandates reading relevant code before applying patches.
-- **Hypothesis-Driven**: Treats bug causes as hypotheses until proven by evidence.
-- **Minimal Patches**: Prefers small, targeted changes over large refactors.
-- **Verification First**: Distinguishes between verified runtime behavior and inferred execution.
-- **Honest Reporting**: Explicitly states remaining uncertainty after work is done.
-
-## 📂 Repository Structure
+## Repository Structure
 
 ```text
 safe-code-agent/
 ├─ README.md
 ├─ AGENTS.md
+├─ CHANGELOG.md
 ├─ LICENSE
+├─ docs/
+│  └─ scoring-rubric.md
 └─ skills/
    └─ safe-code-agent/
       └─ SKILL.md
@@ -109,29 +86,20 @@ safe-code-agent/
 
 ## Best for
 
-- debugging
+- unclear root-cause debugging
 - multi-file changes
-- refactors
-- architecture-sensitive work
-- unclear root causes
-- performance or security-sensitive changes
-- high-risk code changes
+- risky edits
+- verification-sensitive work
 
 ## Not for
 
-This skill is intentionally not optimized for:
 - trivial syntax questions
 - formatting-only edits
-- obvious one-line fixes
-- tasks where a direct answer is enough
 
-For small tasks, use the light process only.
+## Notes
 
-## 📝 Notes
+This is a prompt/skill design, not a benchmark result. Always review generated code and run your own tests.
 
-This is a prompt/skill design, not a benchmark result.  
-It is intended to reduce common coding-agent failure modes, but it cannot guarantee correctness. Always review generated code and run your own tests.
-
-## ⚖️ License
+## License
 
 MIT License - Copyright (c) 2026 kyejin1991

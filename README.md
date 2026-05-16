@@ -98,7 +98,14 @@ safe-code-agent/
 
 ## Notes
 
-This is a prompt/skill design, not a benchmark result. Always review generated code and run your own tests.
+### A Practical Reality Check
+Safe Code Agent is not "magic that makes AI fail less," but a safe workflow that exposes AI errors quickly and fixes them based on evidence. It excels at minimal patching and rigorous re-verification, though it still requires human judgment for high-level design and complex verification strategies.
+
+See the [Full Retrospective & Demo](./docs/retrospective.md) for details.
+
+---
+
+Always review generated code and run your own tests. This is a prompt/skill design, not a benchmark result.
 
 ## License
 

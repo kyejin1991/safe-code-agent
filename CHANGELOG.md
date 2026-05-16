@@ -18,6 +18,7 @@
 - Partial verification label: for honest reporting of incomplete checks.
 - Completion Status: distinguishes Complete, Partial, Pending, and Failure.
 - Evidence Report: structured summary of verification results.
+- **Full Retrospective**: included in `docs/retrospective.md` with a real-world coding review and video demo.
 
 ### Changed
 

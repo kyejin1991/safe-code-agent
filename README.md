@@ -72,11 +72,13 @@ It is designed for situations where safety, verification, and controlled code ch
 
 ## Comparison
 
+These images are qualitative reference views about workflow fit. They are not benchmark results or official model evaluations.
+
 ![AI Coding Skill Comparison](./assets/v021-comparison.png)
 
-![ChatGPT Score Comparison](./assets/v021-chatgpt-score.png)
+![ChatGPT-assisted Score Comparison](./assets/v021-chatgpt-score.png)
 
-![Gemini Score Comparison](./assets/v021-gemini-score.png)
+![Gemini-assisted Score Comparison](./assets/v021-gemini-score.png)
 
 ## Why It Exists
 
@@ -104,23 +106,23 @@ Safe Code Agent exists to make those failures less likely in real coding work.
 
 ```text
 safe-code-agent/
-├─ README.md
-├─ AGENTS.md
-├─ skills/
-│  └─ safe-code-agent/
-│     └─ SKILL.md
-├─ docs/
-│  ├─ scoring-rubric.md
-│  ├─ v0.2.1-stability-notes.md
-│  └─ advanced/
-│     ├─ prototype-to-production.md
-│     ├─ risk-signal-router.md
-│     ├─ runtime-enforcement.md
-│     └─ structured-hallucination.md
-└─ assets/
-   ├─ v021-comparison.png
-   ├─ v021-chatgpt-score.png
-   └─ v021-gemini-score.png
+|-- README.md
+|-- AGENTS.md
+|-- skills/
+|   `-- safe-code-agent/
+|       `-- SKILL.md
+|-- docs/
+|   |-- scoring-rubric.md
+|   |-- v0.2.1-stability-notes.md
+|   `-- advanced/
+|       |-- prototype-to-production.md
+|       |-- risk-signal-router.md
+|       |-- runtime-enforcement.md
+|       `-- structured-hallucination.md
+`-- assets/
+    |-- v021-comparison.png
+    |-- v021-chatgpt-score.png
+    `-- v021-gemini-score.png
 ```
 
 ## Advanced Notes

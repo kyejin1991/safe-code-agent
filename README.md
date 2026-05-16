@@ -70,15 +70,13 @@ It is designed for situations where safety, verification, and controlled code ch
 | Design review before coding | Grill Me-style questioning |
 | Final verification | Safe Code Agent |
 
-## Comparison
+## Demo
 
-These images are qualitative reference views about workflow fit. They are not benchmark results or official model evaluations.
+This short demo shows the intended loop: inspect the failing branch, use Safe Code Agent, patch one line, then verify with a visible test run.
 
-![AI Coding Skill Comparison](./assets/v021-comparison.png)
+[![Safe Code Agent demo](./assets/safe-code-agent-demo.gif)](./assets/safe-code-agent-demo.mp4)
 
-![ChatGPT-assisted Score Comparison](./assets/v021-chatgpt-score.png)
-
-![Gemini-assisted Score Comparison](./assets/v021-gemini-score.png)
+Click the preview to open the full MP4.
 
 ## Why It Exists
 
@@ -120,9 +118,8 @@ safe-code-agent/
 |       |-- runtime-enforcement.md
 |       `-- structured-hallucination.md
 `-- assets/
-    |-- v021-comparison.png
-    |-- v021-chatgpt-score.png
-    `-- v021-gemini-score.png
+    |-- safe-code-agent-demo.gif
+    `-- safe-code-agent-demo.mp4
 ```
 
 ## Advanced Notes

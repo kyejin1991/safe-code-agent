@@ -1,28 +1,5 @@
 # Changelog
 
-## v0.2.1-balanced-router
-
-### Added
-
-- Risk Signal Router in `README.md`, `AGENTS.md`, and `SKILL.md`.
-- `docs/advanced/risk-signal-router.md`.
-- Trigger rules for recommending runtime enforcement, prototype-to-production, and structured hallucination docs.
-
-### Rationale
-
-Balanced-plus made advanced docs optional, but users still had to know when to apply them.
-
-The Risk Signal Router lets the agent detect risk signals and recommend the relevant advanced doc instead of expecting the user to choose manually.
-
-
-## v0.2.1-balanced-plus
-
-### Added
-
-- Advanced docs trigger table in `README.md`.
-- Advanced docs trigger table in `AGENTS.md`.
-
-
 ## v0.2.1-balanced
 
 ### Changed
@@ -101,3 +78,24 @@ Included:
 - verification labels
 - large task memory rules
 - lightweight AGENTS.md defaults
+
+## v0.2.1-balanced-plus
+
+### Added
+
+- Advanced docs trigger table in `README.md`.
+- Advanced docs trigger table in `AGENTS.md`.
+
+## v0.2.1-balanced-router
+
+### Added
+
+- Risk Signal Router in `README.md`, `AGENTS.md`, and `SKILL.md`.
+- `docs/advanced/risk-signal-router.md`.
+- Clear trigger rules for recommending runtime enforcement, prototype-to-production, and structured hallucination docs.
+
+### Rationale
+
+Balanced-plus made advanced docs optional, but users still had to know when to apply them.
+
+The Risk Signal Router lets the agent detect risk signals and recommend the relevant advanced doc instead of expecting the user to choose manually.

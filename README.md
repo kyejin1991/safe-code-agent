@@ -147,16 +147,22 @@ your-project/
 safe-code-agent/
 ├─ README.md
 ├─ AGENTS.md
-├─ CHANGELOG.md
 ├─ LICENSE
+├─ CHANGELOG.md
+├─ assets/
+│  ├─ demo/
+│  │  ├─ safe-code-agent-zoom-demo-base.png
+│  │  ├─ safe-code-agent-zoom-demo.mp4
+│  │  └─ safe-code-agent-zoom-demo.ffscript
+│  └─ proof/
+│     ├─ v2-e1-proof.mp4
+│     └─ v2-e1-proof.html
 ├─ docs/
 │  ├─ scoring-rubric.md
 │  ├─ v0.2.1-stability-notes.md
 │  └─ advanced/
-│     ├─ prototype-to-production.md
-│     ├─ risk-signal-router.md
-│     ├─ runtime-enforcement.md
-│     └─ structured-hallucination.md
+├─ examples/
+│  └─ v2-e1-proof.md
 └─ skills/
    └─ safe-code-agent/
       └─ SKILL.md

@@ -9,6 +9,93 @@ description: A coding skill for complex or risky coding tasks such as debugging,
 
 Goal -> Inspect -> Simulate -> Patch minimally -> Verify -> Report uncertainty
 
+## Compression Rule
+
+Advanced docs are optional and must not be loaded for every task.
+
+Do not load or apply every section for every task.
+
+Start with:
+
+1. Mode Selection
+2. Gate Router
+3. only the triggered gates
+4. Evidence Report
+
+Ignore untriggered gates unless risk changes during the task.
+
+Always-on guidance should stay short. Detailed gates are conditional.
+
+## Risk Signal Router
+
+Do not expect the user to know which advanced doc to load.
+
+During the task, detect risk signals and recommend the relevant advanced doc.
+
+### Runtime Enforcement trigger
+
+Recommend `docs/advanced/runtime-enforcement.md` when any are true:
+
+- the task touches auth, payment, data deletion, migration, persistence, public API, or security-sensitive behavior
+- the agent claims tests/build/lint/commands passed but visible output is missing
+- correctness depends on actual command output, CI, tool logs, or terminal output
+- verification is required but only inferred evidence is available
+
+Recommended message:
+
+```text
+Risk signal detected: verification requires auditable output.
+Recommended advanced doc: docs/advanced/runtime-enforcement.md
+Apply it now?
+```
+
+### Prototype-to-Production trigger
+
+Recommend `docs/advanced/prototype-to-production.md` when any are true:
+
+- prototype work grows beyond 3 files
+- prototype work grows beyond about 120 changed lines
+- exploratory code starts touching core logic
+- prototype code becomes a dependency for future work
+- user wants to ship, reuse, merge, or stabilize prototype code
+
+Recommended message:
+
+```text
+Risk signal detected: prototype code is becoming production-relevant.
+Recommended advanced doc: docs/advanced/prototype-to-production.md
+Apply it now?
+```
+
+### Structured Hallucination trigger
+
+Recommend `docs/advanced/structured-hallucination.md` when any are true:
+
+- the final report looks polished but evidence is unclear
+- claims use words like verified, safe, passed, complete, fixed, no regression, or fully tested without visible evidence
+- evidence is mostly inferred
+- report format is detailed but source labels are missing
+
+Recommended message:
+
+```text
+Risk signal detected: the report may be more polished than the evidence.
+Recommended advanced doc: docs/advanced/structured-hallucination.md
+Apply it now?
+```
+
+### Router rule
+
+Do not apply every advanced doc.
+
+Recommend at most 1 advanced doc at a time unless the task is Critical.
+
+For Critical tasks, recommend up to 2 advanced docs.
+
+Ask before applying advanced docs if doing so will noticeably slow the task.
+
+If the core skill is enough, do not escalate.
+
 ## Instruction Precedence
 
 When global instructions and this skill conflict:
@@ -56,7 +143,7 @@ If you mention activated gates, keep it brief:
 ```text
 Mode: Full
 Activated gates: Contract & Precedence Check, Negative Case Hygiene
-Skipped: Design Interrogation Gate — no architecture decision
+Skipped: Design Interrogation Gate - no architecture decision
 ```
 
 ## Mode Selection
@@ -95,7 +182,23 @@ Verification: <Run / Manual / Not run / Inferred / Partial>
 
 Never omit the verification label, even in Micro Mode.
 
-### Light Mode
+#
+## Prototype Mode
+
+Use Prototype Mode for exploratory UI, throwaway prototypes, visual experiments, or early-stage idea testing.
+
+Prototype Mode limits:
+
+- max 3 files
+- max 120 changed lines
+- no auth, payment, schema, migration, data deletion, security, persistence, or public API changes
+- no claim of production readiness
+- verification may be Manual or Inferred
+- final report must include: Prototype only
+
+Do not use Prototype Mode for core logic, data integrity, security, irreversible behavior, or production-critical code.
+
+## Light Mode
 
 Use Light Mode for simple, local, low-risk changes.
 
@@ -457,7 +560,7 @@ Before suggesting a command, inspect available project files such as package.jso
 If no command is found, say:
 
 ```text
-Next command: unknown — no test script found in inspected files.
+Next command: unknown - no test script found in inspected files.
 ```
 
 If verification is interrupted, report partial results and the exact next command.
@@ -487,6 +590,23 @@ Rules:
 - Targeted success does not imply full correctness.
 - Tests passing does not prove every assumption.
 - Verification Budget may limit what runs, but it must not weaken the status label.
+
+## Completion Status Rules
+
+Completion status must be one of:
+
+- Complete: required verification passed, no required gate remains unresolved, and remaining risks are non-blocking and stated.
+- Implemented, partially verified: targeted checks passed, but full, negative, contract, or expensive checks remain.
+- Implemented, verification pending: code changed, but verification was not run, was interrupted, or is unavailable.
+- Not complete: core verification failed, root cause remains unresolved, or required checks failed.
+
+Do not report Complete when:
+
+- verification is only Inferred
+- required negative or contract checks were not run
+- an expensive required check was skipped
+- a required gate remains unresolved
+- only partial inspection was performed for a broad-impact change
 
 ## Evidence Report
 

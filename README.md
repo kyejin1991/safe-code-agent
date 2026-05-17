@@ -44,6 +44,7 @@ Example targets:
 
 Skill files in this repo:
 
+- `SKILL.md` (root compatibility copy)
 - `skills/safe-code-agent/SKILL.md`
 - `AGENTS.md`
 
@@ -136,6 +137,7 @@ Safe Code Agent exists to make those failures less likely in real coding work.
 safe-code-agent/
 |-- README.md
 |-- AGENTS.md
+|-- SKILL.md
 |-- skills/
 |   `-- safe-code-agent/
 |       |-- agents/

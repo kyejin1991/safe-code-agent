@@ -2,6 +2,8 @@
 
 A coding-agent skill for safer AI code editing: inspect first, patch minimally, verify honestly.
 
+[한국어 정리](./docs/ko-summary.md)
+
 Safe Code Agent helps AI coding agents inspect code before editing, reduce over-editing, verify changes explicitly, and report uncertainty instead of hiding it behind polished output.
 
 It also requires a pre-approval plan before risky implementation, real execution, broad edits, or external effects.
@@ -140,6 +142,7 @@ safe-code-agent/
 |       |   `-- openai.yaml
 |       `-- SKILL.md
 |-- docs/
+|   |-- ko-summary.md
 |   |-- pre-approval-planning.md
 |   |-- scoring-rubric.md
 |   |-- stability-notes.md

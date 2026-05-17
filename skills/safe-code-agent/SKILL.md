@@ -3,7 +3,7 @@ name: safe-code-agent
 description: A coding skill for complex or risky coding tasks such as debugging, multi-file changes, refactors, architecture-sensitive work, unclear root causes, contract/fallback logic, negative tests, and high-risk changes. Use it to reduce over-editing, context loss, hallucinated certainty, and unverified changes.
 ---
 
-# safe-code-agent v0.2
+# safe-code-agent v0.2.2
 
 ## Core Loop
 
@@ -19,8 +19,9 @@ Start with:
 
 1. Mode Selection
 2. Gate Router
-3. only the triggered gates
-4. Evidence Report
+3. Pre-Approval Planning Report when approval is needed
+4. only the triggered gates
+5. Evidence Report
 
 Ignore untriggered gates unless risk changes during the task.
 
@@ -107,6 +108,63 @@ When global instructions and this skill conflict:
 5. Risk overrides size: small changes can require deeper checks when risk is high.
 6. Verification status must never be weakened by mode selection or time budget.
 7. Do not claim broad certainty from partial inspection or partial verification.
+
+## Pre-Approval Planning Report
+
+Before asking the user to approve implementation, real execution, broad edits, external effects, or any risky action, provide a short planning report first.
+
+Use this when any are true:
+
+- the agent is about to ask "proceed?", "approve?", "should I implement this?", or similar
+- the next step may edit files, run real subprocesses, install packages, call network services, push/commit, delete/move files, run migrations, touch persistence, or use secrets
+- the task is Full or Critical Mode
+- the user may not know what approving the action actually permits
+
+Do not ask for approval with only a vague plan.
+
+The report must include:
+
+1. Task Contract
+   - requested behavior
+   - current behavior or known failure
+   - success criteria
+2. Mode and gates
+   - selected mode
+   - activated gates
+   - why the mode is not lighter
+3. Planned inspection
+   - files, functions, logs, configs, tests, or docs to inspect before patching
+4. Planned change points
+   - likely files or modules to change
+   - what each change is expected to do
+5. Minimal-change boundary
+   - what will change
+   - what will not change
+   - existing behavior that must be preserved
+6. Approval reason
+   - exact action needing approval
+   - why approval is needed now
+   - whether the action is reversible
+7. Verification plan
+   - exact commands or manual checks when known
+   - expected evidence label: Run, Manual, Partial, Inferred, or Not run
+   - stop condition if verification fails
+
+Keep the report compact. For Light Mode, 5-8 lines is enough. For Full or Critical Mode, use the full list.
+
+Approval question format:
+
+```text
+Approval needed: <specific action>
+Scope: <files/commands/effects>
+Risk: <main risk>
+Verification after approval: <commands/checks>
+Proceed?
+```
+
+If the user approves without understanding the scope, still preserve the stated boundary. Approval does not authorize unrelated refactors, broad cleanup, hidden behavior changes, or weaker verification.
+
+If new evidence changes the scope after approval, stop and issue a new Pre-Approval Planning Report.
 
 ## Gate Router
 

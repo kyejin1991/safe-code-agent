@@ -1,0 +1,4 @@
+interface:
+  display_name: "Safe Code Agent"
+  short_description: "Safer complex code changes with pre-approval planning and honest verification."
+  default_prompt: "Use $safe-code-agent to inspect the codebase, show the pre-approval plan when approval is needed, make the smallest safe change, and verify the result."

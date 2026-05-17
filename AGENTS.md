@@ -1,4 +1,4 @@
-# Safe Code Agent Defaults v0.2.1
+# Safe Code Agent Defaults v0.2.2
 
 Use these lightweight defaults for all coding work. Keep this file short. Use the full `safe-code-agent` skill only when the task is complex, risky, unclear, or verification-sensitive.
 
@@ -24,6 +24,32 @@ When global instructions and a task-specific skill conflict:
 - Avoid unrelated features, abstractions, rewrites, and refactors.
 - Do not claim verification unless it was actually run or clearly labeled.
 - State remaining uncertainty instead of pretending everything is proven.
+
+## Pre-Approval Planning
+
+Before asking the user to approve implementation, real execution, broad edits, external effects, or risky actions, provide a compact pre-approval plan.
+
+Include:
+
+- Task Contract: requested behavior, current behavior or failure, success criteria
+- Mode and gates: selected mode, activated gates, why the mode is not lighter
+- Planned inspection: files, functions, logs, configs, tests, or docs to inspect before patching
+- Planned change points: likely files or modules to change and why
+- Minimal-change boundary: what will change, what will not change, existing behavior to preserve
+- Approval reason: exact action needing approval, why approval is needed, reversibility
+- Verification plan: exact commands or manual checks when known, evidence label, stop condition if verification fails
+
+Use this approval format:
+
+```text
+Approval needed: <specific action>
+Scope: <files/commands/effects>
+Risk: <main risk>
+Verification after approval: <commands/checks>
+Proceed?
+```
+
+Do not ask for approval with only a vague plan. Approval does not authorize unrelated refactors, broad cleanup, hidden behavior changes, or weaker verification.
 
 ## Trigger the Full Skill
 
@@ -84,12 +110,12 @@ The user should not need to know which advanced doc to load.
 
 Watch for risk signals and recommend the relevant advanced doc when needed:
 
-- Missing command output for claimed tests/build/lint/commands → `docs/advanced/runtime-enforcement.md`
-- Auth, payment, data deletion, migration, persistence, public API, or security-sensitive behavior → consider `docs/advanced/runtime-enforcement.md`
-- Prototype code grows beyond 3 files or about 120 changed lines → `docs/advanced/prototype-to-production.md`
-- Prototype code becomes core logic or future dependency → `docs/advanced/prototype-to-production.md`
-- Polished report but weak evidence → `docs/advanced/structured-hallucination.md`
-- Claims like verified, passed, safe, complete, no regression, or fully tested without visible evidence → `docs/advanced/structured-hallucination.md`
+- Missing command output for claimed tests/build/lint/commands -> `docs/advanced/runtime-enforcement.md`
+- Auth, payment, data deletion, migration, persistence, public API, or security-sensitive behavior -> consider `docs/advanced/runtime-enforcement.md`
+- Prototype code grows beyond 3 files or about 120 changed lines -> `docs/advanced/prototype-to-production.md`
+- Prototype code becomes core logic or future dependency -> `docs/advanced/prototype-to-production.md`
+- Polished report but weak evidence -> `docs/advanced/structured-hallucination.md`
+- Claims like verified, passed, safe, complete, no regression, or fully tested without visible evidence -> `docs/advanced/structured-hallucination.md`
 
 Recommend one advanced doc at a time.
 

@@ -4,6 +4,8 @@ A coding-agent skill for safer AI code editing: inspect first, patch minimally, 
 
 Safe Code Agent helps AI coding agents inspect code before editing, reduce over-editing, verify changes explicitly, and report uncertainty instead of hiding it behind polished output.
 
+It also requires a pre-approval plan before risky implementation, real execution, broad edits, or external effects.
+
 ## Core Loop
 
 ```text
@@ -28,7 +30,8 @@ For tiny tasks, it may feel heavier than a lightweight default prompt.
 1. Copy the skill into your coding-agent setup.
 2. Put the lightweight defaults in your project instructions when needed.
 3. Ask the agent to inspect the code before editing.
-4. Require it to verify changes and report uncertainty.
+4. Require a pre-approval plan before risky actions.
+5. Require it to verify changes and report uncertainty.
 
 Example targets:
 
@@ -78,6 +81,30 @@ This short demo shows the intended loop: inspect the failing branch, use Safe Co
 
 Click the preview to open the full MP4.
 
+## Pre-Approval Planning
+
+When an agent is about to ask for approval, it should not ask with only a vague "proceed?" prompt.
+
+Before approval, Safe Code Agent should state:
+
+- the task contract
+- selected mode and gates
+- files or execution paths it plans to inspect
+- likely change points
+- what will not change
+- why approval is needed
+- how the result will be verified
+
+The approval question should be specific:
+
+```text
+Approval needed: <specific action>
+Scope: <files/commands/effects>
+Risk: <main risk>
+Verification after approval: <commands/checks>
+Proceed?
+```
+
 ## Why It Exists
 
 Many coding-agent failures follow the same pattern:
@@ -94,6 +121,7 @@ Safe Code Agent exists to make those failures less likely in real coding work.
 ## What the Skill Enforces
 
 - inspect relevant code before patching
+- show a pre-approval plan before risky actions
 - preserve local conventions and architecture
 - choose the smallest safe change
 - separate inferred behavior from verified behavior
@@ -108,8 +136,11 @@ safe-code-agent/
 |-- AGENTS.md
 |-- skills/
 |   `-- safe-code-agent/
+|       |-- agents/
+|       |   `-- openai.yaml
 |       `-- SKILL.md
 |-- docs/
+|   |-- pre-approval-planning.md
 |   |-- scoring-rubric.md
 |   |-- v0.2.1-stability-notes.md
 |   `-- advanced/

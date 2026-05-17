@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.2.2-pre-approval-planning
+
+### Added
+
+- Pre-Approval Planning Report in `SKILL.md`.
+- Pre-approval planning defaults in `AGENTS.md`.
+- `docs/pre-approval-planning.md`.
+- `skills/safe-code-agent/agents/openai.yaml`.
+- README section explaining how Safe Code Agent should ask for approval before risky actions.
+
+### Rationale
+
+v0.2.1 made implementation and verification safer after the task started.
+
+This update adds a pre-implementation layer: before asking the user to approve a risky action, the agent must state the intended scope, change points, boundaries, approval reason, and verification plan.
+
 ## v0.2.1-balanced-router
 
 ### Added

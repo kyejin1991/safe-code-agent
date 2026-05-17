@@ -153,7 +153,8 @@ safe-code-agent/
 |       `-- structured-hallucination.md
 `-- assets/
     |-- safe-code-agent-demo.gif
-    `-- safe-code-agent-demo.mp4
+    |-- safe-code-agent-demo.mp4
+    `-- safe-code-agent-v022-pre-approval.png
 ```
 
 ## Advanced Notes

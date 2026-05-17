@@ -142,7 +142,7 @@ safe-code-agent/
 |-- docs/
 |   |-- pre-approval-planning.md
 |   |-- scoring-rubric.md
-|   |-- v0.2.1-stability-notes.md
+|   |-- stability-notes.md
 |   `-- advanced/
 |       |-- prototype-to-production.md
 |       |-- risk-signal-router.md
